@@ -22,7 +22,6 @@ my_score_url = 'https://reporting.smg.com/dashboard.aspx?id=4'
 
 # Email settings
 email_subject = "Bhai laude lag gaye"
-email_body = "The score has fallen to or below 50%. Please check the SMG360 dashboard for details."
 
 def send_email(to_emails, subject, body):
     smtp_server = 'smtp.gmail.com'
@@ -87,6 +86,7 @@ def monitor_score():
             try:
                 score = int(score_text.replace('%', '').strip())
                 print(f"Score: {score}")
+                email_body = "The score has fallen to or below 50%. the score is ${score} Please check the SMG360 dashboard for details."
                 
                 if score <= 82 and (time.time() - last_notification_time) > 3 * 3600:  # 3 hours delay
                     with open('email.txt', 'r') as file:
