@@ -21,7 +21,9 @@ my_score_url = 'https://reporting.smg.com/dashboard.aspx?id=4'
 
 # Email settings
 email_subject = "Bhai laude lag gaye"
-email_body = "The score has fallen to or below 50%. Please check the SMG360 dashboard for details."
+
+# Track the last time an email was sent
+last_email_time = 0
 
 def send_email(to_emails, subject, body):
     smtp_server = 'smtp.gmail.com'
@@ -46,7 +48,16 @@ def send_email(to_emails, subject, body):
             print(f"Error sending email to {email}: {e}")
 
 def monitor_score():
+    global last_email_time
     while True:
+        current_time = time.time()
+        
+        # Check if 3 hours have passed since the last email
+        if current_time - last_email_time < 3 * 3600:
+            print("Waiting for 3 hours before checking the score again...")
+            time.sleep(3600)  # Wait for 1 hour before checking again
+            continue
+        
         driver = webdriver.Chrome()  # Ensure you have the Chrome WebDriver installed
         driver.get(login_url)
 
@@ -79,11 +90,13 @@ def monitor_score():
             try:
                 score = int(score_text.replace('%', '').strip())
                 print(f"Score: {score}")
+                email_body = f"The score has fallen to or below 50%. The score is ${score} Please check the SMG360 dashboard for details."
                 
-                if score <= 50:
+                if score <= 82:
                     with open('email.txt', 'r') as file:
                         to_emails = [line.strip() for line in file]
                     send_email(to_emails, email_subject, email_body)
+                    last_email_time = current_time  # Update the last email time after sending
             except ValueError:
                 print("Score value is not in the expected format.")
         except TimeoutException:
@@ -91,7 +104,7 @@ def monitor_score():
             driver.save_screenshot('div_error.png')
         
         driver.quit()
-        time.sleep(3600)  # Wait for 1 hour before checking again
+        time.sleep(60)  # Wait for 1 hour before checking again
 
 @app.route('/')
 def index():
