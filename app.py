@@ -13,8 +13,8 @@ import time
 app = Flask(__name__)
 
 # User credentials
-username = 'Tb951023@redberry.ca'
-password = 'Chalupa@12345'
+username = os.getenv('username')
+password = os.getenv('password')
 login_url = 'https://reporting.smg.com/index.aspx'
 my_score_url = 'https://reporting.smg.com/dashboard.aspx?id=4'
 
@@ -25,8 +25,8 @@ email_body = "The score has fallen to or below 50%. Please check the SMG360 dash
 def send_email(to_emails, subject, body):
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587  # TLS
-    smtp_user = 'harinrana398@gmail.com'
-    smtp_password = 'fdzs inic iwix zaei'
+    smtp_user = os.getenv('smtp_user')
+    smtp_password = os.getenv('smtp_password')
     
     for email in to_emails:
         msg = MIMEMultipart()
